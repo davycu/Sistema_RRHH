@@ -1,0 +1,41 @@
+﻿.notification-container {
+    position: relative;
+}
+
+.notification-dot {
+    position: absolute;
+    top: 10px; /* ajusta el valor según sea necesario */
+    right: 2px; /* ajusta el valor según sea necesario */
+    width: 8px;
+    height: 8px;
+    background-color: ghostwhite; /* color */
+    border-radius: 50%;
+}
+
+.notifications-dropdown {
+    position: absolute;
+    top: 100%; /* justo debajo del ícono, o ajusta según convenga */
+    right: 0;
+    width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+.notification-block {
+    padding: 10px;
+    background-color: #f8f8f8; /* Color de fondo claro */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+    .notification-block:hover {
+        background-color: #e8e8e8;
+    }

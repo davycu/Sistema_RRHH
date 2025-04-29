@@ -1,0 +1,353 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Admin.Master.cs" Inherits="Sistema_RRHH.SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="es">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Panel de Administración de HonduHR" />
+    <meta name="author" content="HonduHR" />
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server" /></title>
+    
+    <script src="Content/BsLogin/assets/plugins/jquery/jquery-1.9.1.min.js"></script>
+    <script src="Content/BsLogin/assets/plugins/jquery/jquery-migrate-1.1.0.min.js"></script>
+    <link href="Content/BsAdmin/css/styles.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" integrity="sha384-DyZ88mC6Up2uqS0h/4IEm0+KfVQzKChxbSj0E2d6Z9e5YhshDX4qdg9HDPHlf+Dm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    
+    <link href="Content/CustomMensajes.css" rel="stylesheet" />
+    <link href="Content/CheckboxStyle.css" rel="stylesheet" />
+    <link href="Content/EstiloNotificacion.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="Content/custom-grid.css" />
+
+    <!--D3 charts -->
+    <link rel="stylesheet" href="Content/BsLogin/assets/plugins/nvd3/build/nv.d3.css" />
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="Content/BsLogin/assets/plugins/nvd3/build/nv.d3.js"></script>
+
+    <!-- chart js -->
+    <script src="Content/BsLogin/assets/plugins/chart-js/Chart.min.js"></script>
+
+    <script src="Scripts/DashboardCharts.js"></script>
+
+    <!-- CSS de DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" />
+
+    <!--<script src="Scripts/jquery-3.7.0.js"></script>-->
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    
+    
+
+</head>
+<body class="sb-nav-fixed">
+    <form runat="server">
+        <asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true" />
+        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+            <a class="navbar-brand ps-3" href="Inicio.aspx">HonduHR</a>
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+
+            <!-- Contenedor de elementos alineados a la derecha -->
+            <div class="d-flex ms-auto">
+                <ul class="navbar-nav">
+                    <!-- Mostrar el Username de la Sesión -->
+                    <li class="nav-item">
+                        <span class="nav-link text-white">
+                            <asp:Literal ID="litUsuario" runat="server" Mode="PassThrough"></asp:Literal>
+                        </span>
+                    </li>
+
+                    <!-- Icono de Mensajes -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="Mensajes.aspx" id="notificacionesDropdown" role="button">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge bg-danger" id="notifCount"></span>
+                        </a>
+                    </li>
+
+                    <!-- Ícono de Notificaciones -->
+                    <li class="nav-item notification-container">
+                        <asp:UpdatePanel ID="upNotificaciones" runat="server">
+                            <ContentTemplate>
+                                <a class="nav-link" href="#" id="notificaciones" role="button" onclick="toggleNotifications(event);">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="notification-dot" id="notifCountNotificaciones" runat="server"></span>
+                                </a>
+                                <!-- Contenedor para la lista de notificaciones -->
+                                <div id="notificationsDropdown" class="notifications-dropdown" style="display: none;">
+                                    <asp:Repeater ID="rptNotificaciones" runat="server">
+                                        <HeaderTemplate>
+                                            <ul class="list-group">
+                                        </HeaderTemplate>
+                                        <ItemTemplate>
+                                            <li class="list-group-item">
+                                                <div class="notification-block"
+                                                     data-url='<%# GetNotificationRedirectUrl(Eval("Tipo").ToString()) %>'
+                                                    onclick="return marcarNotificacionLeida('<%# Eval("Id") %>', this.getAttribute('data-url'));">
+                                                    <%# Eval("mensaje") %>
+                                                    <br />
+                                                    <small>(<%# Eval("FechaCreacion", "{0:dd/MM/yyyy HH:mm}") %>)</small>
+                                                </div>
+                                            </li>
+                                        </ItemTemplate>
+                                        <FooterTemplate>
+                                            </ul>
+                                        </FooterTemplate>
+                                    </asp:Repeater>
+                                </div>
+                                <!-- Botón oculto para disparar el postback -->
+                                <asp:Button ID="btnMarcarNotificaciones" runat="server" OnClick="btnMarcarNotificaciones_Click" Style="display: none;" />
+                            </ContentTemplate>
+                            <Triggers>
+                                <asp:AsyncPostBackTrigger ControlID="btnMarcarNotificaciones" EventName="Click" />
+                            </Triggers>
+                        </asp:UpdatePanel>
+                    </li>
+
+                    <!-- Menú desplegable de usuario -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user fa-fw"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="ActualizarDatos.aspx">Actualizar Información</a></li>
+                            <li><a class="dropdown-item" href="ManualUsuario.aspx">Manual de Usuario</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" href="CerrarSesion.aspx">Cerrar Sesión</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <!-- Sidebar de Navegación -->
+                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        
+                        <!-- Inicio -->
+                        <a class="nav-link ps-3 mt-3" href="Inicio.aspx">
+                            <i class="fas fa-home me-2"></i>Inicio
+                        </a>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+                        <div id="collapseAnuncios" runat="server" visible="false">
+                            <a class="nav-link ps-3" href="Anuncios.aspx">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>Anuncios</span>
+                            </a>
+                        </div>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+                        <!-- Seccion de Ajustes visible para Admin -->
+                        <div id="collapseAdmin" runat="server">
+                            <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdminMenu" aria-expanded="false">
+                                <i class="fas fa-cog me-2"></i>Opciones Admin
+                                    <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                            </a>
+                            <div class="collapse" id="collapseAdminMenu" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav ps-3">
+                                    <a class="nav-link" href="CrearUsuario.aspx"><i class="fas fa-user-shield me-2"></i>Crear Usuario</a>
+                                    <a class="nav-link" href="AjustesPeriodos.aspx"><i class="fas fa-sliders-h me-2"></i>Periodos</a>
+                                    <a class="nav-link" href="AjustesEvaluaciones.aspx"><i class="fas fa-tasks me-2"></i>Evaluaciones</a>
+                                    <a class="nav-link" href="Auditoria.aspx"><i class="fas fa-clipboard-list me-2"></i>Auditoría</a>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+                        <!-- Sección de RRHH -->
+                        <div id="headingRRHH" runat="server" class="sb-sidenav-menu-heading mt-4 mb-3 ps-3">Recursos Humanos</div>
+
+                        <!-- Dashboard -->
+                        <div id="collapseDashboard" runat="server">
+                            <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDashboardMenu" aria-expanded="false" aria-controls="collapseDashboardMenu">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                                <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                            </a>
+                            <div class="collapse" id="collapseDashboardMenu" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="Dashboard.aspx#barChart">
+                                        <i class="fas fa-chart-bar me-2"></i>Distribución Empleados
+                                    </a>
+                                    <a class="nav-link" href="Dashboard.aspx#evalCharts">
+                                        <i class="fas fa-chart-pie me-2"></i>Evaluaciones Completas
+                                    </a>
+                                    <a class="nav-link" href="Dashboard.aspx#lineChart">
+                                        <i class="fas fa-chart-line me-2"></i>Análisis Permisos
+                                    </a>
+                                    <a class="nav-link" href="Dashboard.aspx#chartGenero">
+                                        <i class="fas fa-chart-pie me-2"></i>Distribución por Género
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+                         <!-- Reportes -->
+                         <div id="collapseReportes" runat="server">
+                             <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapseReportesMenu" aria-expanded="false" aria-controls="collapseReportesMenu">
+                                 <i class="fas fa-file-alt me-2"></i>Reportes
+                                 <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                             </a>
+                             <div class="collapse" id="collapseReportesMenu" data-bs-parent="#sidenavAccordion">
+                                 <nav class="sb-sidenav-menu-nested nav">
+                                     <a class="nav-link" href="ReporteEvaluacionAnual.aspx">
+                                         <i class="fas fa-chart-line me-2"></i>Evaluación Anual
+                                     </a>
+                                     <a class="nav-link" href="InfoEmpleados.aspx">
+                                        <i class="fas fa-users me-2"></i>Info Empleados
+                                    </a>
+                                     <a class="nav-link" href="HistorialEvaluaciones.aspx">
+                                        <i class="fas fa-history me-2"></i>Historial Evaluaciones
+                                    </a>
+                                     <a class="nav-link" href="ReportePermisos.aspx">
+                                         <i class="fas fa-file-alt me-2"></i>Reporte Permisos
+                                     </a>
+                                 </nav>
+                             </div>
+                         </div>
+
+                          <!-- Espacio entre Menús -->
+                          <div class="mt-4"></div>
+
+                        <!-- Administración (Solo visible para Admin y RH) -->
+                        <div id="collapseAdminRh" runat="server">
+                        <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdminRhMenu" aria-expanded="false">
+                            <i class="fas fa-cogs me-2"></i>Administración
+       
+                            <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                        </a>
+                        <div class="collapse" id="collapseAdminRhMenu" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav ps-3">
+                                <a class="nav-link" href="CrearEmpleado.aspx"><i class="fas fa-user-plus me-2"></i>Crear Empleado</a>
+                                <a class="nav-link" href="CrearDepto.aspx"><i class="fas fa-building me-2"></i>Crear Departamento</a>
+                                <a class="nav-link" href="CrearPermiso.aspx"><i class="fas fa-id-badge me-2"></i>Crear Permiso</a>
+                            </nav>
+                        </div>
+                    </div>
+
+
+                    <!-- Espacio entre Menús -->
+                    <div class="mt-4"></div>
+
+                        <!-- Sección de Menú -->
+                        <div class="sb-sidenav-menu-heading mt-4 mb-3 ps-3">Menú</div>
+
+                        <!-- Gestión de Permisos -->
+                        <div id="collapsePermisos" runat="server">
+                        <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePermisosMenu" aria-expanded="false">
+                            <i class="fas fa-user-clock me-2"></i>Gestión de Permisos
+   
+                            <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                        </a>
+                        <div class="collapse" id="collapsePermisosMenu" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav ps-3">
+                                <a class="nav-link" href="AprobarPermiso.aspx"><i class="fas fa-check-circle me-2"></i>Aprobar</a>
+                                <a class="nav-link" href="IngresarPermiso.aspx"><i class="fas fa-file-signature me-2"></i>Solicitar</a>
+                                <a class="nav-link ps-3" href="HistorialPermisos.aspx"><i class="fas fa-history me-2"></i>Historial</a>
+                            </nav>
+                        </div>
+                        </div>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+                        <!-- Gestión de Evaluaciones  -->
+                        <div id="collapseEvaluaciones" runat="server">
+                        <a class="nav-link collapsed ps-3" href="#" data-bs-toggle="collapse" data-bs-target="#collapseEvaluacionesMenu" aria-expanded="false">
+                            <i class="fas fa-clipboard-list me-2"></i>Evaluaciones
+   
+                            <span class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></span>
+                        </a>
+                        <div class="collapse" id="collapseEvaluacionesMenu" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav ps-3">
+                                <a class="nav-link" href="EvaluarEmpleados.aspx"><i class="fas fa-user-check me-2"></i>Evaluar Personal</a>
+                                <a class="nav-link" href="AutoEvaluacion.aspx"><i class="fas fa-edit me-2"></i>Autoevaluar</a>
+                                 <a class="nav-link" href="HistorialEvalSupv.aspx">
+                                    <i class="fas fa-history me-2"></i>Historial Evaluaciones
+                                </a>
+                            </nav>
+                        </div>
+                        </div>
+
+                        <!-- Espacio entre Menús -->
+                        <div class="mt-4"></div>
+
+
+                        <!-- solo si el rol es "empleado" -->
+                        <asp:Panel ID="panelEmpleado" runat="server" Visible="false">
+                            
+                            <a class="nav-link ps-3" href="IngresarPermiso.aspx">
+                                <i class="fas fa-calendar-check me-2"></i>Ingresar Permiso
+                            </a>
+
+                             <!-- Espacio entre Menús -->
+                            <div class="mt-4"></div>
+
+                            <a class="nav-link ps-3" href="HistorialPermisos.aspx">
+                                <i class="fas fa-history me-2"></i>Historial Permisos
+                            </a>
+
+                            <div class="mt-4"></div>
+
+                            <a class="nav-link ps-3" href="AutoEvaluacion.aspx">
+                                <i class="fas fa-edit me-2"></i> Autoevaluación
+                            </a>
+                        </asp:Panel>
+
+                    </div>
+
+                    <!-- Footer dentro del nav -->
+                    <div class="sb-sidenav-footer">
+                        <div class="small">Conectado como:</div>
+                        <asp:Literal ID="litRol" runat="server" Mode="PassThrough"></asp:Literal>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Contenido Principal -->
+            <div id="layoutSidenav_content">
+                <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">© 2024 HonduHR - Sistema de Gestión de Permisos y Evaluaciones</div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <!-- <link href="Content/BsLogin/assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet" /> -->
+    <link href="Content/BsLogin/assets/plugins/bootstrap-datepicker/css/bootstrap-datepicker.css" rel="stylesheet" />
+    <script src="Content/BsLogin/assets/plugins/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="Content/BsAdmin/js/scripts.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+    <script src="Scripts/ActualizarMensajes.js"></script>
+    <script src="Scripts/Notificaciones.js"></script>
+
+    <script type="text/javascript">
+        var btnMarcarNotificacionesID = '<%= btnMarcarNotificaciones.ClientID %>';
+    </script>
+
+    <asp:ContentPlaceHolder ID="ScriptsContent" runat="server"></asp:ContentPlaceHolder>
+
+</body>
+</html>
+

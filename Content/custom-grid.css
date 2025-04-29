@@ -1,0 +1,11 @@
+﻿.custom-grid {
+    font-size: 0.85rem; /* Tamaño de fuente más pequeño */
+    table-layout: auto;
+}
+
+    .custom-grid tbody td {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+

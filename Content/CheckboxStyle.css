@@ -1,0 +1,15 @@
+﻿
+.form-check span {
+    display: block; /* cada opción en su propia línea */
+    margin-bottom: 5px; /* Espacio vertical entre opciones */
+}
+
+/* Separa la casilla del texto */
+.form-check input[type="checkbox"] {
+    margin-right: 10px; /* Espacio casilla y su etiqueta */
+}
+
+/* separar más el texto */
+.form-check label {
+    padding-left: 5px;
+}

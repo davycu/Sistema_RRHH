@@ -1,0 +1,115 @@
+﻿
+/* Sección: Contactos            */
+
+.contact-list {
+    margin: 0;
+    padding: 0;
+}
+
+.contact-box {
+    background-color: #343a40; /* Gris oscuro */
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .contact-box:hover {
+        background-color: #495057;
+    }
+
+.contact-name {
+    font-size: 1rem;
+}
+
+/* Indicador de nuevo mensaje: punto rojo */
+.new-message-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+/* Para los enlaces de contacto: cambiar hover para que el fondo sea blanco y el texto negro */
+.contacto {
+    display: block;
+    padding: 10px;
+    background-color: #343a40;
+    color: white;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    text-decoration: none;
+}
+
+    .contacto:hover {
+        background-color: #C0C0C0; /* Fondo blanco */
+        color: #000; /* Texto negro */
+    }
+
+/* Sección: Chat                 */
+
+/* Container del área de chat */
+#chatArea {
+    background-color: #e9ecef; /* Gris claro */
+    padding: 15px;
+    border-radius: 5px;
+    height: 600px; /* ajustar en el aspx */
+    overflow-y: auto;
+}
+
+/* Estilos para los mensajes */
+.message {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    max-width: 80%;
+    clear: both;
+}
+
+    /* Mensajes enviados: derecha */
+    .message.sent {
+        background-color: #cfe2ff; /* Azul muy claro */
+        text-align: right;
+        float: right;
+        font-style: oblique;
+    }
+
+    /* Mensajes recibidos: izquierda */
+    .message.received {
+        background-color: #F0F8FF; /* alice blue  */
+        text-align: left;
+        float: left;
+        
+    }
+
+/* sombra para destacarse */
+.message {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#notificacionesDropdown {
+    position: relative;
+    display: inline-block;
+}
+
+
+#notifCount.badge.bg-danger {
+    position: absolute !important;
+    top: 5px !important;
+    right: 0px !important;
+    color: azure !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    border: none !important;
+}
+
+
